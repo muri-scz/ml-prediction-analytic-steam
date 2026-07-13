@@ -25,8 +25,8 @@ def load_pipeline():
 
 @st.cache_data
 def load_dataset():
-    file_id = "1AUJDCuY9OKSdty2Vc9CE2robJSF0nu_y"
-    output = "games_march2025_cleaned.csv"
+    file_id = "1p71tZrOTpaLY4fm0AWfBzh3cL4vGikdK"
+    output = "games_streamlit.csv"
 
     if not os.path.exists(output):
         gdown.download(
