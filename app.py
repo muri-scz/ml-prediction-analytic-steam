@@ -38,7 +38,7 @@ def load_dataset():
     return pd.read_csv(output)
 
 
-pipeline = load_pipeline()
+#pipeline = load_pipeline()
 df = load_dataset()
 
 # =====================================================
