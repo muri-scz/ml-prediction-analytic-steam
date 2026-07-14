@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import gdown
 import os
+import xgboost as xgb
 
 # =====================================================
 # PAGE CONFIG
@@ -18,9 +19,15 @@ st.set_page_config(
 # LOAD MODEL & DATASET
 # =====================================================
 @st.cache_resource
-def load_pipeline():
-    pipeline = joblib.load("steam_pipeline.pkl")
-    return pipeline
+def load_model():
+
+    preprocessor = joblib.load("preprocessor.pkl")
+
+    model = xgb.XGBClassifier()
+
+    model.load_model("xgb_model.json")
+
+    return preprocessor, model
 
 
 @st.cache_data
@@ -38,7 +45,7 @@ def load_dataset():
     return pd.read_csv(output)
 
 
-#pipeline = load_pipeline()
+preprocessor, model = load_model()
 df = load_dataset()
 
 # =====================================================
@@ -189,7 +196,12 @@ if st.button("Predict Popularity"):
         [selected_row[training_columns]]
     )
 
-    prediction = pipeline.predict(input_data)[0]
+    X = preprocessor.transform(input_data)
+
+    if hasattr(X, "toarray"):
+        X = X.toarray()
+
+    prediction = model.predict(X)[0]
 
     popularity = label_mapping[prediction]
 
@@ -207,8 +219,8 @@ if st.button("Predict Popularity"):
     # ============================================
     # PROBABILITY SCORE
     # ============================================
-    if hasattr(pipeline, "predict_proba"):
-        probs = pipeline.predict_proba(input_data)[0]
+    if hasattr(model, "predict_proba"):
+        probs = model.predict_proba(X)[0]
 
         prob_df = pd.DataFrame({
             "Popularity": list(label_mapping.values()),
@@ -216,10 +228,7 @@ if st.button("Predict Popularity"):
         })
 
         st.subheader("Prediction Probability")
-        st.bar_chart(
-            prob_df.set_index("Popularity")
-        )
-
+        st.bar_chart(prob_df.set_index("Popularity"))
         st.dataframe(prob_df)
 
 # =====================================================
