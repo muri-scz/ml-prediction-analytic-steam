@@ -219,18 +219,10 @@ if st.button("Predict Popularity"):
     # ============================================
     # PROBABILITY SCORE
     # ============================================
-    if hasattr(model, "predict_proba"):
-        probs = model.predict_proba(X)[0]
-
-        prob_df = pd.DataFrame({
-            "Popularity": list(label_mapping.values()),
-            "Probability": probs
-        })
-
-        st.subheader("Prediction Probability")
-        st.bar_chart(prob_df.set_index("Popularity"))
-        st.dataframe(prob_df)
-
+    st.metric(
+    label="Predicted Popularity",
+    value=popularity
+    )
 # =====================================================
 # FOOTER
 # =====================================================
